@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: d1647ad29583cbd408b8195041df39d2
-timeCreated: 1511806831
+timeCreated: 1511967715
 licenseType: Free
 MonoImporter:
   externalObjects: {}
@@ -11,6 +11,7 @@ MonoImporter:
   - gravelSprite: {fileID: 21300000, guid: 6dade215c1145c64995b41dc4f5ae795, type: 3}
   - roughtStoneSprite: {fileID: 21300000, guid: 4f55ea54754e4dc4d9da2bcd32f8cd14,
       type: 3}
+  - floorSprite: {fileID: 21300000, guid: b887ed06921f84d45868292c57057b69, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

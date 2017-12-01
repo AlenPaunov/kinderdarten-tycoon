@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum TileType {Soil, Gravel, RoughStone, Sand, Floor};
 public class Tile{
 
-	public enum TileType {Soil, Gravel, RoughStone, Sand, Floor};
 	TileType type = TileType.Soil;
+	public TileType previousType;
 
 	/// <summary>
 	/// The callback for tile type changed.
 	/// </summary>
 	Action<Tile> cb_TileTypeChanged;
-
 
 	public TileType Type {
 		get {
@@ -28,7 +28,7 @@ public class Tile{
 	}
 
 	DynamicObject dynamicObject;
-	StaticObject staticObject;
+	public StaticObject staticObject{ get; set; }
 
 	World world;
 	public int X{ get; protected set;}
@@ -82,6 +82,23 @@ public class Tile{
 			}
 		}
 		return false;
+	}
+
+	public bool PlaceObject(StaticObject objInstance){
+		if (objInstance == null) {
+			//WE are uninstalling
+			staticObject = null;
+			return true;
+		}
+
+		if (staticObject != null) {
+			Debug.LogError ("tryig to install on installed static object");
+			return false;
+		} 
+		else {
+			staticObject = objInstance;
+			return true;
+		}
 	}
 		
 

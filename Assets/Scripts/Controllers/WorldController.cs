@@ -6,20 +6,27 @@ using System.Linq;
 public class WorldController : MonoBehaviour {
 	public World World{ get; protected set;}
 	public static WorldController Instance{ get; protected set;}
-
+	public Dictionary<Tile, GameObject> tileGameobjectMap;
+	public Dictionary<StaticObject, GameObject> staticObjGameobjectMap;
 	public Sprite sandSprite;
 	public Sprite soilSprite;
 	public Sprite gravelSprite;
 	public Sprite roughtStoneSprite;
 	public Sprite floorSprite;
+	public Sprite wallSprite; //FIXME;
 
 	// Use this for initialization
 	void Start () {
-		World = new World ();
+		
 		if (Instance!=null) {
 			Debug.LogError ("two worlds error");
 		}
 		Instance = this;
+		World = new World ();
+		World.RegisterStaticObjectCreated (OnStaticObjectCreated);
+		// instantiate tileGameobject map
+		tileGameobjectMap = new Dictionary<Tile, GameObject>();
+
 		//create GameObject for each tile in the world
 		for (int x = 0; x < World.Width; x++) {
 			for (int y = 0; y < World.Height; y++) {
@@ -28,16 +35,23 @@ public class WorldController : MonoBehaviour {
 				GameObject tile_go = new GameObject ();
 				tile_go.name = "Tile_" + x + "_" + y;
 
+				tileGameobjectMap.Add (tile_data, tile_go);	
+
 				tile_go.transform.position	= new Vector3 (tile_data.X, tile_data.Y, tile_data.Z);
 				tile_go.transform.SetParent (this.transform, true);
 
 				tile_go.AddComponent<SpriteRenderer> ();
 
-				tile_data.RegisterTypeChangedCallBack ((tile) => {OnTileTypeChanged(tile, tile_go);});
-
+				//tile_data.RegisterTypeChangedCallBack ((tile) => {OnTileTypeChanged(tile, tile_go);});
+				tile_data.RegisterTypeChangedCallBack (OnTileTypeChanged);
 			}	
 		}
 		World.RandomizeTiles ();
+	}
+
+	// Update is called once per frame
+	void Update () {
+
 	}
 
 	/// <summary>
@@ -45,18 +59,30 @@ public class WorldController : MonoBehaviour {
 	/// </summary>
 	/// <param name="tile_Data">Tile data.</param>
 	/// <param name="tile_go">Tile go.</param>
-	void OnTileTypeChanged(Tile tile_Data, GameObject tile_go){
+	void OnTileTypeChanged(Tile tile_Data){
+		if (tileGameobjectMap.ContainsKey(tile_Data)==false) {
+			Debug.LogError("Missing tile in tileGOmap - forget to add or not unregister");
+			return;
+		}
+		GameObject tile_go = tileGameobjectMap [tile_Data];
 
-		if (tile_Data.Type == Tile.TileType.Gravel) {
+		if (tile_go == null) {
+			Debug.LogError("Missing tile in tileGOmap - forget to add or not unregister");
+			return;
+		}
+
+		if (tile_Data.Type == TileType.Gravel) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = gravelSprite;
-		} else if (tile_Data.Type == Tile.TileType.Sand) {
+		} else if (tile_Data.Type == TileType.Sand) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = sandSprite;
-		} else if (tile_Data.Type == Tile.TileType.Soil) {
+		} else if (tile_Data.Type == TileType.Soil) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = soilSprite;
-		} else if (tile_Data.Type == Tile.TileType.RoughStone) {
+		} else if (tile_Data.Type == TileType.RoughStone) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = roughtStoneSprite;
-		} else if (tile_Data.Type == Tile.TileType.Floor) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = floorSprite;
+		} else if (tile_Data.Type == TileType.Floor) {
+			SpriteRenderer sr = tile_go.GetComponent<SpriteRenderer> ();
+			sr.sprite = floorSprite;
+			//sr.color = new Color (0.76f, 0.36f, 0, 1); 	
 		}else {
 			Debug.LogError ("Error in Sprite of tile with type " + tile_Data.Type);
 		}
@@ -73,9 +99,42 @@ public class WorldController : MonoBehaviour {
 
 		return World.GetTileAt (x, y);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	//UNIMPLEMENTED
+	/// <summary>
+	/// Destroies all tiles. THIS IS FOR LATER IN GAME WHEN WE HAVE MULTIPLE FLOORS/LAYERS/LEVELS
+	/// </summary>
+	void DestroyAllTiles(){
+		while (tileGameobjectMap.Count>0) {
+			Tile tile_data = tileGameobjectMap.First ().Key;
+			GameObject	tile_go = tileGameobjectMap [tile_data];
+
+			tileGameobjectMap.Remove (tile_data);
+			tile_data.UnregisterTypeChangedCallBack (OnTileTypeChanged);
+			Destroy (tile_go);
+		}
+
+		//after this we would call soething to rebuild all the objects for the tiles on new floor/ level
 	}
+
+	public void OnStaticObjectCreated(StaticObject obj){
+		GameObject obj_go = new GameObject ();
+		obj_go.name = "obj_" + obj.ObjectType;
+
+		staticObjGameobjectMap.Add (obj, obj_go);	
+
+		obj_go.transform.position	= new Vector3 (obj.Tile.X, obj.Tile.Y, -2);
+		obj_go.transform.SetParent (this.transform, true);
+
+		//FIXME: assume the object must be a wall so we use harcoded wall sprite
+		obj_go.AddComponent<SpriteRenderer> ().sprite = wallSprite;
+		obj.RegisterOnChangedCallBack (OnStaticObjectCreated);
+
+	
+	}
+
+	void OnStaticObjChanged(StaticObject obj){
+		// not implemented
+	}
+
 }

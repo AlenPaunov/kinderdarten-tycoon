@@ -1,14 +1,25 @@
 fileFormatVersion: 2
 guid: 9c8dcd69ccfb6c4429e6f89eb8eef885
-timeCreated: 1511969697
+timeCreated: 1512333083
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Wall_Planks_0
-    21300002: Wall_Planks_WS
+    21300000: Wall_Planks_
+    21300002: Wall_Planks_SW
     21300004: Wall_Planks_W
-    21300006: Wall_Planks_WNES
-    21300008: Wall_Atlas_Planks.tex_0
+    21300006: Wall_Planks_NESW
+    21300008: Wall_Planks_N
+    21300010: Wall_Planks_E
+    21300012: Wall_Planks_S
+    21300014: Wall_Planks_ES
+    21300016: Wall_Planks_EW
+    21300018: Wall_Planks_NE
+    21300020: Wall_Planks_NW
+    21300022: Wall_Planks_NS
+    21300024: Wall_Planks_ESW
+    21300026: Wall_Planks_NSW
+    21300028: Wall_Planks_NEW
+    21300030: Wall_Planks_NES
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -83,7 +94,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Wall_Planks_0
+      name: Wall_Planks_
       rect:
         serializedVersion: 2
         x: 5
@@ -97,7 +108,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Wall_Planks_WS
+      name: Wall_Planks_SW
       rect:
         serializedVersion: 2
         x: 5
@@ -125,11 +136,11 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Wall_Planks_WNES
+      name: Wall_Planks_NESW
       rect:
         serializedVersion: 2
         x: 197
-        y: 202
+        y: 197
         width: 54
         height: 54
       alignment: 6
@@ -139,14 +150,168 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Wall_Atlas_Planks.tex_0
+      name: Wall_Planks_E
       rect:
         serializedVersion: 2
-        x: 192
-        y: 89
-        width: 10
-        height: 24
-      alignment: 0
+        x: 133
+        y: 5
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_N
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 5
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_S
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 69
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_ES
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 69
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_EW
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 133
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NE
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 5
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NW
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 133
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NS
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 69
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_ESW
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 197
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NSW
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 197
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NEW
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 133
+        width: 54
+        height: 54
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Wall_Planks_NES
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 69
+        width: 54
+        height: 54
+      alignment: 6
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []

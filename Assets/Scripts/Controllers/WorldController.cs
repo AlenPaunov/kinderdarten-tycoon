@@ -8,6 +8,8 @@ public class WorldController : MonoBehaviour {
 	public static WorldController Instance{ get; protected set;}
 	public Dictionary<Tile, GameObject> tileGameobjectMap;
 	public Dictionary<StaticObject, GameObject> staticObjGameobjectMap;
+	public Dictionary<string, Sprite> staticObjectsSprites;
+
 	public Sprite sandSprite;
 	public Sprite soilSprite;
 	public Sprite gravelSprite;
@@ -17,15 +19,18 @@ public class WorldController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+
 		if (Instance!=null) {
 			Debug.LogError ("two worlds error");
 		}
+
+		LoadSprites ();
 		Instance = this;
 		World = new World ();
 		World.RegisterStaticObjectCreated (OnStaticObjectCreated);
 		// instantiate tileGameobject map
 		tileGameobjectMap = new Dictionary<Tile, GameObject>();
+		staticObjGameobjectMap = new Dictionary<StaticObject, GameObject> ();
 
 		//create GameObject for each tile in the world
 		for (int x = 0; x < World.Width; x++) {
@@ -47,11 +52,21 @@ public class WorldController : MonoBehaviour {
 			}	
 		}
 		World.RandomizeTiles ();
+
+		Camera.main.transform.position = new Vector3 (World.Width/2,World.Height/2,Camera.main.transform.position.z);
 	}
 
 	// Update is called once per frame
 	void Update () {
 
+	}
+
+	void LoadSprites(){
+		staticObjectsSprites = new Dictionary<string, Sprite> ();
+		Sprite [] sprites = Resources.LoadAll<Sprite> ("Objects");
+		foreach (Sprite s in sprites) {
+			staticObjectsSprites[s.name] = s;
+		}
 	}
 
 	/// <summary>
@@ -120,21 +135,56 @@ public class WorldController : MonoBehaviour {
 	public void OnStaticObjectCreated(StaticObject obj){
 		GameObject obj_go = new GameObject ();
 		obj_go.name = "obj_" + obj.ObjectType;
-
 		staticObjGameobjectMap.Add (obj, obj_go);	
 
 		obj_go.transform.position	= new Vector3 (obj.Tile.X, obj.Tile.Y, -2);
 		obj_go.transform.SetParent (this.transform, true);
 
+
 		//FIXME: assume the object must be a wall so we use harcoded wall sprite
-		obj_go.AddComponent<SpriteRenderer> ().sprite = wallSprite;
-		obj.RegisterOnChangedCallBack (OnStaticObjectCreated);
-
-	
+		obj_go.AddComponent<SpriteRenderer> ().sprite = GetSpriteForStaticObject(obj);
+		obj.RegisterOnChangedCallBack (OnStaticObjChanged);
 	}
 
-	void OnStaticObjChanged(StaticObject obj){
+	public void OnStaticObjChanged(StaticObject obj){
 		// not implemented
+		if (staticObjGameobjectMap.ContainsKey(obj)==false) {
+			Debug.LogError ("missing object WC line 150" + obj.Tile.ToString ());
+			return;
+		}
+		GameObject obj_go = staticObjGameobjectMap[obj];
+		obj_go.GetComponent<SpriteRenderer> ().sprite = GetSpriteForStaticObject (obj);
 	}
+
+	Sprite GetSpriteForStaticObject(StaticObject obj){
+		if (obj.LinksToNeighbour == false) {
+			return staticObjectsSprites [obj.ObjectType];
+		} 
+		string spriteName = obj.ObjectType+"_";
+		int x = obj.Tile.X;
+		int y = obj.Tile.Y;
+
+		Tile t;
+		t = World.GetTileAt (x, y + 1);
+		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+			spriteName += "N";
+		}
+		t = World.GetTileAt (x+1, y);
+		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+			spriteName += "E";
+		}
+		t = World.GetTileAt (x, y - 1);
+		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+			spriteName += "S";
+		}
+		t = World.GetTileAt (x-1, y);
+		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+			spriteName += "W";
+		}
+
+		return staticObjectsSprites [spriteName];
+	}
+
+
 
 }

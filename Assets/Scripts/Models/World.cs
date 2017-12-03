@@ -5,18 +5,21 @@ using System;
 
 public class World {
 	Tile[,] tiles;
+
 	Dictionary<string,StaticObject> staticObjectsPrototypes;
 	List<Baby> babies;
+
 	public int Width{ get; protected set; }
 	public int Height{ get; protected set; }
 
 	Action<StaticObject> cb_StaticObjectCreated;
+
 	/// <summary>
 	/// Initializes a new instance of the World class.
 	/// </summary>
 	/// <param name="width">Width.</param>
 	/// <param name="height">Height.</param>
-	public World(int width = 30, int height = 30){
+	public World(int width = 60, int height = 60){
 		this.Width = width;
 		this.Height = height;
 
@@ -34,22 +37,23 @@ public class World {
 
 	void CreateStaticObjectPrototypes(){
 		staticObjectsPrototypes = new Dictionary<string, StaticObject> ();
-		staticObjectsPrototypes.Add ("Wall",
-			StaticObject.CreatePrototype ("Wall", 0, 1, 1));
-	}
 
-	/// <summary>
-	/// Gets the tile at x and y.
-	/// </summary>
-	/// <returns>The <see cref="Tile"/>.</returns>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	public Tile GetTileAt(int x, int y) {
-		if (x>Width||x<0||y>Height||y<0) {
-			//Debug.LogError ("wrong coordinates for a tile" + x + " " + y);
-			return null;
-		}
-		return tiles [x, y];
+		staticObjectsPrototypes.Add ("Wall_Planks",	
+			StaticObject.CreatePrototype (
+				"Wall_Planks", 
+				0, // IMPASSABLE
+				1, // width
+				1,  // height
+				true // links to neighbours
+			));
+		staticObjectsPrototypes.Add ("Door_Simple",	
+			StaticObject.CreatePrototype (
+				"Door_Simple", 
+				0, // IMPASSABLE
+				1, // width
+				1,  // height
+				false // links to neighbours
+			));
 	}
 		
 	/// <summary>
@@ -76,6 +80,20 @@ public class World {
 		}
 	}
 
+	/// <summary>
+	/// Gets the tile at x and y.
+	/// </summary>
+	/// <returns>The <see cref="Tile"/>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	public Tile GetTileAt(int x, int y) {
+		if (x>Width||x<0||y>Height||y<0) {
+			//Debug.LogError ("wrong coordinates for a tile" + x + " " + y);
+			return null;
+		}
+		return tiles [x, y];
+	}
+
 	public void PlaceStaticObject (string buildModeObjectType, Tile t)
 	{
 		//TODO: 1 BY 1 TIles assumed change this later with no rotation;
@@ -84,6 +102,11 @@ public class World {
 			return;
 		}
 		StaticObject obj = StaticObject.PlaceInstance (staticObjectsPrototypes [buildModeObjectType],t);
+
+		if (obj == null) {
+			//failed to place obj
+			return;
+		}
 
 		if (cb_StaticObjectCreated != null) {
 			cb_StaticObjectCreated (obj);

@@ -27,16 +27,16 @@ public class Tile{
 		}
 	}
 
-	DynamicObject dynamicObject;
-	public StaticObject staticObject{ get; set; }
+	public DynamicObject DynamicObject { get; protected set;}
+	public StaticObject StaticObject{ get; protected set; }
 
-	World world;
+	public World World{ get; protected set;}
 	public int X{ get; protected set;}
 	public int Y{ get; protected set;}
 	public int Z{ get; protected set;}
 
 	public Tile(World world, int x, int y){
-		this.world = world;
+		this.World = world;
 		this.X = x;
 		this.Y = y;
 		this.Z = 0;
@@ -87,16 +87,16 @@ public class Tile{
 	public bool PlaceObject(StaticObject objInstance){
 		if (objInstance == null) {
 			//WE are uninstalling
-			staticObject = null;
+			StaticObject = null;
 			return true;
 		}
 
-		if (staticObject != null) {
+		if (StaticObject != null) {
 			Debug.LogError ("tryig to install on installed static object");
 			return false;
 		} 
 		else {
-			staticObject = objInstance;
+			StaticObject = objInstance;
 			return true;
 		}
 	}

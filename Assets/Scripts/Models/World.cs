@@ -13,6 +13,7 @@ public class World {
 	public int Height{ get; protected set; }
 
 	Action<StaticObject> cb_StaticObjectCreated;
+	Action<Tile> cb_TileChanged;
 
 	/// <summary>
 	/// Initializes a new instance of the World class.
@@ -27,6 +28,7 @@ public class World {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				tiles [x, y] = new Tile (this, x, y);
+				tiles [x, y].RegisterChangedCallBack (OnTileChanged);
 			}
 		}
 		CreateStaticObjectPrototypes ();
@@ -119,5 +121,19 @@ public class World {
 
 	public void UnregisterStaticObjectCreated(Action<StaticObject> callback){
 		cb_StaticObjectCreated -= callback;
+	}
+
+	public void RegisterTileChanged(Action<Tile> callback){
+		cb_TileChanged += callback;
+	}
+
+	public void UnregisterTileChanged(Action<Tile> callback){
+		cb_TileChanged -= callback;
+	}
+
+	void OnTileChanged(Tile t){
+		if (cb_TileChanged == null)
+			return;
+		cb_TileChanged (t);
 	}
 }

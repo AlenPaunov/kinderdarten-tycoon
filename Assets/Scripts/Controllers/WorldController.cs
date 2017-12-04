@@ -18,7 +18,7 @@ public class WorldController : MonoBehaviour {
 	public Sprite wallSprite; //FIXME;
 
 	// Use this for initialization
-	void Start () {
+	void OnEnable () {
 
 		if (Instance!=null) {
 			Debug.LogError ("two worlds error");
@@ -46,11 +46,9 @@ public class WorldController : MonoBehaviour {
 				tile_go.transform.SetParent (this.transform, true);
 
 				tile_go.AddComponent<SpriteRenderer> ();
-
-				//tile_data.RegisterTypeChangedCallBack ((tile) => {OnTileTypeChanged(tile, tile_go);});
-				tile_data.RegisterTypeChangedCallBack (OnTileTypeChanged);
 			}	
 		}
+		World.RegisterTileChanged (OnTileChanged);
 		World.RandomizeTiles ();
 
 		Camera.main.transform.position = new Vector3 (World.Width/2,World.Height/2,Camera.main.transform.position.z);
@@ -74,7 +72,7 @@ public class WorldController : MonoBehaviour {
 	/// </summary>
 	/// <param name="tile_Data">Tile data.</param>
 	/// <param name="tile_go">Tile go.</param>
-	void OnTileTypeChanged(Tile tile_Data){
+	void OnTileChanged(Tile tile_Data){
 		if (tileGameobjectMap.ContainsKey(tile_Data)==false) {
 			Debug.LogError("Missing tile in tileGOmap - forget to add or not unregister");
 			return;
@@ -125,7 +123,7 @@ public class WorldController : MonoBehaviour {
 			GameObject	tile_go = tileGameobjectMap [tile_data];
 
 			tileGameobjectMap.Remove (tile_data);
-			tile_data.UnregisterTypeChangedCallBack (OnTileTypeChanged);
+			tile_data.UnregisterChangedCallBack (OnTileChanged);
 			Destroy (tile_go);
 		}
 

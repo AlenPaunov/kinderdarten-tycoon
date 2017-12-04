@@ -12,7 +12,7 @@ public class Tile{
 	/// <summary>
 	/// The callback for tile type changed.
 	/// </summary>
-	Action<Tile> cb_TileTypeChanged;
+	Action<Tile> cb_TileChanged;
 
 	public TileType Type {
 		get {
@@ -21,8 +21,8 @@ public class Tile{
 		set {
 			type = value;
 			//call back on type change
-			if (cb_TileTypeChanged != null) {
-				cb_TileTypeChanged (this);
+			if (cb_TileChanged != null) {
+				cb_TileChanged (this);
 			}
 		}
 	}
@@ -47,17 +47,17 @@ public class Tile{
 	/// Registers the type changed call back.
 	/// </summary>
 	/// <param name="callback">Callback.</param>
-	public void RegisterTypeChangedCallBack(Action<Tile> callback){
+	public void RegisterChangedCallBack(Action<Tile> callback){
 	
-		cb_TileTypeChanged += callback;
+		cb_TileChanged += callback;
 	}
 
 	/// <summary>
 	/// Unregisters the type changed call back.
 	/// </summary>
 	/// <param name="callback">Callback.</param>
-	public void UnregisterTypeChangedCallBack(Action<Tile> callback){
-		cb_TileTypeChanged -= callback;
+	public void UnregisterChangedCallBack(Action<Tile> callback){
+		cb_TileChanged -= callback;
 	}
 
 	/// <summary>

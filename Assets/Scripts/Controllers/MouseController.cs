@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,11 +10,6 @@ public class MouseController : MonoBehaviour
 	public GameObject highlightCell;
 	public GameObject highlightCellPrefab;
 	public GameObject ghoustCell;
-
-	bool buildModeIsObject = false;
-	TileType buildModeTileType;
-	string buildModeObjectType;
-
 
 
 	// the world positions
@@ -56,6 +52,19 @@ public class MouseController : MonoBehaviour
 		Camera.main.orthographicSize = Mathf.Clamp (Camera.main.orthographicSize, 1f, 6f);
 	}
 
+	void UpdateHighLightCell ()
+	{
+		//update the highlight cell pos;
+		Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord (currFramePos);
+		if (tileUnderMouse != null) {
+			Vector3 cursorPos = new Vector3 (tileUnderMouse.X, tileUnderMouse.Y, -5);
+			highlightCell.transform.position = cursorPos;
+			highlightCell.SetActive (true);
+		} else {
+			highlightCell.SetActive (false);
+		}
+	}
+
 	void UpdateDragging ()
 	{
 		// if over UI return
@@ -84,23 +93,10 @@ public class MouseController : MonoBehaviour
 			startY = tmp;
 		}
 		//clean drag previews
-		while (dragHighlightCellObjects.Count > 0) {
-			GameObject obj = dragHighlightCellObjects [0];
-			dragHighlightCellObjects.RemoveAt (0);
-			SimplePool.Despawn (obj);
-		}
+		CleanDragPreview ();
 
 
 		if (Input.GetMouseButton (0)) {
-			// display a preview of drag area
-//			switch (mode) {
-//				case Mode.Build_Floor:
-//				case Mode.Remove_Floor:
-//					break;
-//
-//				case Mode.Build_Wall:
-//					break;
-//			}
 			for (int x = startX; x <= endX; x++) {
 				for (int y = startY; y <= endY; y++) {
 					Tile t = WorldController.Instance.World.GetTileAt (x, y);
@@ -112,112 +108,29 @@ public class MouseController : MonoBehaviour
 				}
 			}
 		}
-
-
+			
 		//End Dragging
 		if (Input.GetMouseButtonUp (0)) {
-			switch (mode) {
-			case Mode.Build_Floor:
-			case Mode.Remove_Floor:
-				BuildRemoveFloor (startX, endX, startY, endY);
-				break;
-			case Mode.Build_Obj:
-				BuildObject (startX, endX, startY, endY);
-				break;
-			}
+			BuildController bc = GameObject.FindObjectOfType<BuildController> ();
 
-		}
-	}
-
-
-	void BuildObject (int startX, int endX, int startY, int endY)
-	{
-		for (int x = startX; x <= endX; x++) {
-			for (int y = startY; y <= endY; y++) {
-				Tile t = WorldController.Instance.World.GetTileAt (x, y);
-
-				if (t != null) {
-					WorldController.Instance.World.PlaceStaticObject (buildModeObjectType, t);
-				}
-			}
-		}
-
-
-	}
-
-	/// <summary>
-	/// Remove floor - reverts to original tile under the floor.
-	/// </summary>
-	void BuildRemoveFloor (int startX, int endX, int startY, int endY)
-	{
-		for (int x = startX; x <= endX; x++) {
-			for (int y = startY; y <= endY; y++) {
-				Tile t = WorldController.Instance.World.GetTileAt (x, y);
-				if (t != null) {
-					switch (mode) {
-					case Mode.Build_Floor:
-						if (t.Type != TileType.Floor) {
-							t.previousType = t.Type;
-						}	
-						t.Type = TileType.Floor;
-						break;
-					case Mode.Remove_Floor:
-						t.Type = t.previousType;
-						break;
+			for (int x = startX; x <= endX; x++) {
+				for (int y = startY; y <= endY; y++) {
+					Tile t = WorldController.Instance.World.GetTileAt (x, y);
+					if (t!=null) {
+						bc.DoBuild (t);
 					}
 				}
 			}
 		}
 	}
 
-	void UpdateHighLightCell ()
+	void CleanDragPreview ()
 	{
-		//update the highlight cell pos;
-		Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord (currFramePos);
-		if (tileUnderMouse != null) {
-			Vector3 cursorPos = new Vector3 (tileUnderMouse.X, tileUnderMouse.Y, -5);
-			highlightCell.transform.position = cursorPos;
-			highlightCell.SetActive (true);
-		} else {
-			highlightCell.SetActive (false);
+		while (dragHighlightCellObjects.Count > 0) {
+			GameObject obj = dragHighlightCellObjects [0];
+			dragHighlightCellObjects.RemoveAt (0);
+			SimplePool.Despawn (obj);
 		}
 	}
-
-
-	/// <summary>
-	/// Sets the mode to build floor.
-	/// </summary>
-	public void SetMode_BuildFloor ()
-	{
-		mode = Mode.Build_Floor;
-		buildModeIsObject = false;
-	}
-
-	/// <summary>
-	/// Sets the mode to remove floor.
-	/// </summary>
-	public void SetMode_RemoveFloor ()
-	{
-		mode = Mode.Remove_Floor;
-		buildModeIsObject = false;
-	}
-
-	/// <summary>
-	/// Sets the mode build object.
-	/// </summary>
-	/// <param name="buildObjectType">Build object type.</param>
-	public void SetMode_BuildObject (string buildObjectType)
-	{
-		//wall is not a tile
-		buildModeIsObject = true;
-		if (buildObjectType == "Wall_Planks") {
-			mode = Mode.Build_Obj;
-			buildModeObjectType = buildObjectType;
-		}
-		if (buildObjectType == "Door_Simple") {
-			mode = Mode.Build_Obj;
-			buildModeObjectType = buildObjectType;
-		}
-
-	}
+		
 }

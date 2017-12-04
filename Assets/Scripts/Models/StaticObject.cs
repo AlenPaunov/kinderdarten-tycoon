@@ -20,6 +20,9 @@ public class StaticObject{
 
 	Action<StaticObject> cb_OnChanged;
 
+	public Func<Tile, bool> funcPositionValidation;
+
+
 	protected StaticObject(){
 	}
 
@@ -31,6 +34,8 @@ public class StaticObject{
 		obj.movementCost = movementCost;
 		obj.ObjectType = objectType;
 		obj.LinksToNeighbour = linksToNeighbour;
+
+		obj.funcPositionValidation = obj.IsValidPosition;
 
 		return obj;
 	}
@@ -88,5 +93,17 @@ public class StaticObject{
 		cb_OnChanged -= callback;
 	}
 
+	public bool IsValidPosition(Tile t){
+		if (t.StaticObject != null) {
+			return false;
+		}
+		return true;
+	}
 
+	public bool IsValidPosition_Door(Tile t){
+		if (IsValidPosition(t)==false) {
+			return false;
+		}
+		return true;
+	}
 }

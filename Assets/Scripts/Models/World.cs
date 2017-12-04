@@ -4,8 +4,10 @@ using UnityEngine;
 using System;
 
 public class World {
+	//out tile data
 	Tile[,] tiles;
 
+	// The static objects prototypes.
 	Dictionary<string,StaticObject> staticObjectsPrototypes;
 	List<Baby> babies;
 
@@ -15,12 +17,18 @@ public class World {
 	Action<StaticObject> cb_StaticObjectCreated;
 	Action<Tile> cb_TileChanged;
 
+	//TODO: replace with dedicated CLASS FOR JOBS
+	public Queue<Job> jobQueue;
+
 	/// <summary>
 	/// Initializes a new instance of the World class.
 	/// </summary>
 	/// <param name="width">Width.</param>
 	/// <param name="height">Height.</param>
 	public World(int width = 60, int height = 60){
+
+		jobQueue = new Queue<Job> ();
+
 		this.Width = width;
 		this.Height = height;
 
@@ -135,5 +143,9 @@ public class World {
 		if (cb_TileChanged == null)
 			return;
 		cb_TileChanged (t);
+	}
+
+	public bool IsStaticObjectPlacementValid(string objType, Tile t){
+		return staticObjectsPrototypes [objType].IsValidPosition(t);
 	}
 }

@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public enum TileType {Soil, Gravel, RoughStone, Sand, Floor};
+public enum TileType { Floor, Soil, Gravel, RoughStone, Sand};
 public class Tile{
 
 	TileType type = TileType.Soil;
 	public TileType previousType;
-
-	/// <summary>
-	/// The callback for tile type changed.
-	/// </summary>
-	Action<Tile> cb_TileChanged;
-
 	public TileType Type {
 		get {
 			return type;
@@ -26,9 +20,16 @@ public class Tile{
 			}
 		}
 	}
-
 	public DynamicObject DynamicObject { get; protected set;}
 	public StaticObject StaticObject{ get; protected set; }
+
+	public Job pendingJob;
+	/// <summary>
+	/// The callback for tile type changed.
+	/// </summary>
+	Action<Tile> cb_TileChanged;
+
+
 
 	public World World{ get; protected set;}
 	public int X{ get; protected set;}

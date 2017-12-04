@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: ea4a80c879fe10c4a8113a434d33043b
+timeCreated: 1511967715
+licenseType: Free
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sandSprite: {fileID: 21300000, guid: b75f8035750558e4ebaf7753a7ea0acb, type: 3}
+  - soilSprite: {fileID: 21300000, guid: 3bd769038b788e944aae14ed468e9ab1, type: 3}
+  - gravelSprite: {fileID: 21300000, guid: 6dade215c1145c64995b41dc4f5ae795, type: 3}
+  - roughtStoneSprite: {fileID: 21300000, guid: 4f55ea54754e4dc4d9da2bcd32f8cd14,
+      type: 3}
+  - floorSprite: {fileID: 21300000, guid: b887ed06921f84d45868292c57057b69, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

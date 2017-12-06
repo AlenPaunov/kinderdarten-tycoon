@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Path_TileGraph {
 
-	Dictionary<Tile,Path_Node<Tile>> nodes; 
+	public Dictionary<Tile,Path_Node<Tile>> nodes; 
 
 	// Initializes a new instance of the <see cref="Path_TileGraph"/> class.
 	public Path_TileGraph(World world){

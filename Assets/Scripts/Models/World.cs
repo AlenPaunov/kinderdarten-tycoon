@@ -12,7 +12,7 @@ public class World {
 	List<Baby> babies;
 	List<Character> characters;
 
-	public Path_TileGraph PathfindingGraph { get; protected set;}
+	public Path_TileGraph PathfindingGraph { get; set;}
 
 	public int Width{ get; protected set; }
 	public int Height{ get; protected set; }

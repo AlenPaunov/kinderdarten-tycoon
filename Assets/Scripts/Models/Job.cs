@@ -5,15 +5,18 @@ using System;
 
 public class Job {
 	
-	public Tile tile{ get; protected set;}
+	public Tile Tile{ get; protected set;}
 	float jobTime;
+
+	public string jobObjectType { get; protected set;}
 
 	Action<Job> cbJobComplete;
 	Action<Job> cbJobCancel;
 
-	public Job(Tile tile,  Action<Job> cbJobComplete, float jobTime = 1f){
-		this.tile = tile;
+	public Job(Tile tile, string jobObjType, Action<Job> cbJobComplete, float jobTime = 1f){
+		this.Tile = tile;
 		this.jobTime = jobTime;
+		this.jobObjectType = jobObjType;
 		this.cbJobComplete += cbJobComplete;
 	}
 

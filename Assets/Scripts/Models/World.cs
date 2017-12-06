@@ -10,15 +10,18 @@ public class World {
 	// The static objects prototypes.
 	Dictionary<string,StaticObject> staticObjectsPrototypes;
 	List<Baby> babies;
+	List<Character> characters;
+
+	public Path_TileGraph PathfindingGraph { get; protected set;}
 
 	public int Width{ get; protected set; }
 	public int Height{ get; protected set; }
 
 	Action<StaticObject> cb_StaticObjectCreated;
 	Action<Tile> cb_TileChanged;
+	Action<Character> cb_CharacterCreated;
 
-	//TODO: replace with dedicated CLASS FOR JOBS
-	public Queue<Job> jobQueue;
+	public JobQueue jobQueue;
 
 	/// <summary>
 	/// Initializes a new instance of the World class.
@@ -27,7 +30,7 @@ public class World {
 	/// <param name="height">Height.</param>
 	public World(int width = 60, int height = 60){
 
-		jobQueue = new Queue<Job> ();
+		jobQueue = new JobQueue();
 
 		this.Width = width;
 		this.Height = height;
@@ -40,9 +43,26 @@ public class World {
 			}
 		}
 		CreateStaticObjectPrototypes ();
+		characters = new List<Character> ();
 
 		babies = new List<Baby>();
 		Baby a = new Baby(tiles[Width/2,Height/2]);
+	}
+
+	public void Update(float deltaTime){
+		foreach (var c in characters) {
+			c.Update (deltaTime);
+		}
+	}
+
+	public Character CreateCharacter(Tile t){
+		Character c = new Character(t);
+
+		characters.Add (c);
+		if (cb_CharacterCreated != null) {
+			cb_CharacterCreated (c);
+		}
+		return c;
 	}
 
 	void CreateStaticObjectPrototypes(){
@@ -59,7 +79,7 @@ public class World {
 		staticObjectsPrototypes.Add ("Door_Simple",	
 			StaticObject.CreatePrototype (
 				"Door_Simple", 
-				0, // IMPASSABLE
+				2,
 				1, // width
 				1,  // height
 				false // links to neighbours
@@ -120,6 +140,7 @@ public class World {
 
 		if (cb_StaticObjectCreated != null) {
 			cb_StaticObjectCreated (obj);
+			InvalidatePathfindingGraph ();
 		}
 	}
 
@@ -139,10 +160,25 @@ public class World {
 		cb_TileChanged -= callback;
 	}
 
+	public void RegisterCharacterCreated(Action<Character> callback){
+		cb_CharacterCreated += callback;
+	}
+
+	public void UnregisterCharacterCreated(Action<Character> callback){
+		cb_CharacterCreated -= callback;
+	}
+
+	// called when any tile changes
 	void OnTileChanged(Tile t){
 		if (cb_TileChanged == null)
 			return;
 		cb_TileChanged (t);
+		InvalidatePathfindingGraph ();
+	}
+
+	public void InvalidatePathfindingGraph()
+	{
+		PathfindingGraph = null;
 	}
 
 	public bool IsStaticObjectPlacementValid(string objType, Tile t){

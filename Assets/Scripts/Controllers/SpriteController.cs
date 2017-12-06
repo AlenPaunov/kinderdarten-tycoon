@@ -30,29 +30,29 @@ public class SpriteController : MonoBehaviour {
 		staticObjGameobjectMap = new Dictionary<StaticObject, GameObject> ();
 
 		//create GameObject for each tile in the world
-		for (int x = 0; x < world.Width; x++) {
-			for (int y = 0; y < world.Height; y++) {
-				Tile tile_data = world.GetTileAt (x, y);
-
-				GameObject tile_go = new GameObject ();
-				tile_go.name = "Tile_" + x + "_" + y;
-
-				tileGameobjectMap.Add (tile_data, tile_go);	
-
-				tile_go.transform.position	= new Vector3 (tile_data.X, tile_data.Y, tile_data.Z);
-				tile_go.transform.SetParent (this.transform, true);
-
-				tile_go.AddComponent<SpriteRenderer> ().sprite = GetSpriteForTile(tile_data);
-			}	
-		}
+		CreateTilesObjects ();
 
 		world.RegisterTileChanged (OnTileChanged);
 		world.RegisterStaticObjectCreated (OnStaticObjectCreated);
+	}
 
-		Camera.main.transform.position = new Vector3 (world.Width/2,world.Height/2,Camera.main.transform.position.z);
+	void CreateTilesObjects ()
+	{
+		for (int x = 0; x < world.Width; x++) {
+			for (int y = 0; y < world.Height; y++) {
+				Tile tile_data = world.GetTileAt (x, y);
+				GameObject tile_go = new GameObject ();
+				tile_go.name = "Tile_" + x + "_" + y;
+				tileGameobjectMap.Add (tile_data, tile_go);
+				tile_go.transform.position = new Vector3 (tile_data.X, tile_data.Y, tile_data.Z);
+				tile_go.transform.SetParent (this.transform, true);
+				tile_go.AddComponent<SpriteRenderer> ().sprite = GetSpriteForTile (tile_data);
+			}
+		}
 	}
 
 	void LoadSprites(){
+		
 		staticObjectsSprites = new Dictionary<string, Sprite> ();
 		Sprite [] sprites = Resources.LoadAll<Sprite> ("Objects");
 		foreach (Sprite s in sprites) {
@@ -72,6 +72,7 @@ public class SpriteController : MonoBehaviour {
 	/// <param name="tile_Data">Tile data.</param>
 	/// <param name="tile_go">Tile go.</param>
 	void OnTileChanged(Tile tile_Data){
+		
 		if (tileGameobjectMap.ContainsKey(tile_Data)==false) {
 			Debug.LogError("Missing tile in tileGOmap - forget to add or not unregister");
 			return;
@@ -98,6 +99,7 @@ public class SpriteController : MonoBehaviour {
 		}else {
 			Debug.LogError ("Error in Sprite of tile with type " + tile_Data.Type);
 		}
+
 	}
 
 	//UNIMPLEMENTED
@@ -105,6 +107,7 @@ public class SpriteController : MonoBehaviour {
 	/// Destroies all tiles. THIS IS FOR LATER IN GAME WHEN WE HAVE MULTIPLE FLOORS/LAYERS/LEVELS
 	/// </summary>
 	void DestroyAllTiles(){
+		
 		while (tileGameobjectMap.Count>0) {
 			Tile tile_data = tileGameobjectMap.First ().Key;
 			GameObject	tile_go = tileGameobjectMap [tile_data];
@@ -113,11 +116,11 @@ public class SpriteController : MonoBehaviour {
 			tile_data.UnregisterChangedCallBack (OnTileChanged);
 			Destroy (tile_go);
 		}
-
 		//after this we would call soething to rebuild all the objects for the tiles on new floor/ level
 	}
 
 	public void OnStaticObjectCreated(StaticObject obj){
+		
 		GameObject obj_go = new GameObject ();
 		obj_go.name = "obj_" + obj.ObjectType;
 		staticObjGameobjectMap.Add (obj, obj_go);	
@@ -129,9 +132,11 @@ public class SpriteController : MonoBehaviour {
 		//FIXME: assume the object must be a wall so we use harcoded wall sprite
 		obj_go.AddComponent<SpriteRenderer> ().sprite = GetSpriteForStaticObject(obj);
 		obj.RegisterOnChangedCallBack (OnStaticObjChanged);
+
 	}
 
 	public void OnStaticObjChanged(StaticObject obj){
+		
 		// not implemented
 		if (staticObjGameobjectMap.ContainsKey(obj)==false) {
 			Debug.LogError ("missing object WC line 150" + obj.Tile.ToString ());
@@ -139,13 +144,17 @@ public class SpriteController : MonoBehaviour {
 		}
 		GameObject obj_go = staticObjGameobjectMap[obj];
 		obj_go.GetComponent<SpriteRenderer> ().sprite = GetSpriteForStaticObject (obj);
+
 	}
 
 	Sprite GetSpriteForTile(Tile tile){
+		
 		return tilesSprites [tile.Type.ToString()];
+
 	}
 
 	Sprite GetSpriteForStaticObject(StaticObject obj){
+		
 		if (obj.LinksToNeighbour == false) {
 			return staticObjectsSprites [obj.ObjectType];
 		} 
@@ -172,8 +181,7 @@ public class SpriteController : MonoBehaviour {
 		}
 
 		return staticObjectsSprites [spriteName];
+
 	}
-
-
-
+		
 }

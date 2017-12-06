@@ -10,7 +10,7 @@ public class StaticObject{
 	//queried by the visuall sys to know what sprite to render
 	public string ObjectType{get; protected set;}
 	//if movementcost = 0 - impassable;
-	float movementCost = 1f;
+	public float movementCost {get; protected set;}
 
 	// a table might be 3 by 3 area visually, but occupy 3x5 really
 	int width = 1;

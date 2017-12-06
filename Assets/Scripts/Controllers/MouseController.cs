@@ -94,20 +94,7 @@ public class MouseController : MonoBehaviour
 		}
 		//clean drag previews
 		CleanDragPreview ();
-
-
-		if (Input.GetMouseButton (0)) {
-			for (int x = startX; x <= endX; x++) {
-				for (int y = startY; y <= endY; y++) {
-					Tile t = WorldController.Instance.World.GetTileAt (x, y);
-					if (t != null) {
-						GameObject go = SimplePool.Spawn (highlightCellPrefab, new Vector3 (x, y, -1), Quaternion.identity);
-						go.transform.SetParent (this.transform, true);
-						dragHighlightCellObjects.Add (go);
-					}
-				}
-			}
-		}
+		HighlightPreview (startX, endX, startY, endY);
 			
 		//End Dragging
 		if (Input.GetMouseButtonUp (0)) {
@@ -130,6 +117,22 @@ public class MouseController : MonoBehaviour
 			GameObject obj = dragHighlightCellObjects [0];
 			dragHighlightCellObjects.RemoveAt (0);
 			SimplePool.Despawn (obj);
+		}
+	}
+
+	void HighlightPreview (int startX, int endX, int startY, int endY)
+	{
+		if (Input.GetMouseButton (0)) {
+			for (int x = startX; x <= endX; x++) {
+				for (int y = startY; y <= endY; y++) {
+					Tile t = WorldController.Instance.World.GetTileAt (x, y);
+					if (t != null) {
+						GameObject go = SimplePool.Spawn (highlightCellPrefab, new Vector3 (x, y, -1), Quaternion.identity);
+						go.transform.SetParent (this.transform, true);
+						dragHighlightCellObjects.Add (go);
+					}
+				}
+			}
 		}
 	}
 		

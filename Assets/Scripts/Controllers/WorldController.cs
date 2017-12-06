@@ -16,9 +16,15 @@ public class WorldController : MonoBehaviour {
 			
 		Instance = this;
 		World = new World ();
+		Camera.main.transform.position = new Vector3 (World.Width/2,World.Height/2,Camera.main.transform.position.z);
+		Camera.main.orthographicSize = 2;
 
 	}
 
+	void Update(){
+		//TODO PAUSE/UNPAUSE;	
+		World.Update (Time.deltaTime);
+	}
 	/// <summary>
 	/// Gets the tile at world coordinate.
 	/// </summary>

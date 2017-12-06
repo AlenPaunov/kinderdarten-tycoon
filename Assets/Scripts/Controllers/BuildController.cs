@@ -36,21 +36,20 @@ public class BuildController : MonoBehaviour
 		if (WorldController.Instance.World.IsStaticObjectPlacementValid (buildModeObjectType, t) && t.pendingJob == null) {
 			
 			string objType = buildModeObjectType;
-			Job	j = new Job (t, (theJob) => {
-				WorldController.Instance.World.PlaceStaticObject (objType, theJob.tile);
+			Job	j = new Job (t,objType, (theJob) => {
+				WorldController.Instance.World.PlaceStaticObject (objType, theJob.Tile);
 				t.pendingJob = null;
 			}
 			);
 
 			t.pendingJob = j;
-			j.RegisterJobCancelCallBack ((theJob) => {theJob.tile.pendingJob = null;
+			j.RegisterJobCancelCallBack ((theJob) => {theJob.Tile.pendingJob = null;
 			});
 
 			WorldController.Instance.World.jobQueue.Enqueue (j);
-			Debug.Log ("Job Queue size: " + WorldController.Instance.World.jobQueue.Count);
 		}
 	}
-		
+
 	/// <summary>
 	/// Remove floor - reverts to original tile under the floor.
 	/// </summary>

@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Xml.Serialization;
+using System.Xml;
 
-public class World {
+public class World :IXmlSerializable {
 	//out tile data
 	Tile[,] tiles;
+	List<Character> characters;
+	public Path_TileGraph PathfindingGraph { get; set;}
 
 	// The static objects prototypes.
 	Dictionary<string,StaticObject> staticObjectsPrototypes;
-	List<Baby> babies;
-	List<Character> characters;
-
-	public Path_TileGraph PathfindingGraph { get; set;}
 
 	public int Width{ get; protected set; }
 	public int Height{ get; protected set; }
 
-	Action<StaticObject> cb_StaticObjectCreated;
-	Action<Tile> cb_TileChanged;
+	Action<StaticObject> cb_StaticObjectCreated; //cbFurnitureCreated
 	Action<Character> cb_CharacterCreated;
+	Action<Tile> cb_TileChanged;
 
 	public JobQueue jobQueue;
 
@@ -28,12 +28,18 @@ public class World {
 	/// </summary>
 	/// <param name="width">Width.</param>
 	/// <param name="height">Height.</param>
-	public World(int width = 60, int height = 60){
+	public World(int width, int height){
+
+		SetupWorld (width, height);
+
+	}
+
+	void SetupWorld(int width, int height){
 
 		jobQueue = new JobQueue();
 
-		this.Width = width;
-		this.Height = height;
+		Width = width;
+		Height = height;
 
 		tiles = new Tile[width, height];
 		for (int x = 0; x < width; x++) {
@@ -42,15 +48,15 @@ public class World {
 				tiles [x, y].RegisterChangedCallBack (OnTileChanged);
 			}
 		}
+
 		CreateStaticObjectPrototypes ();
+
 		characters = new List<Character> ();
 
-		babies = new List<Baby>();
-		Baby a = new Baby(tiles[Width/2,Height/2]);
 	}
 
 	public void Update(float deltaTime){
-		foreach (var c in characters) {
+		foreach (Character c in characters) {
 			c.Update (deltaTime);
 		}
 	}
@@ -76,6 +82,7 @@ public class World {
 				1,  // height
 				true // links to neighbours
 			));
+		
 		staticObjectsPrototypes.Add ("Door_Simple",	
 			StaticObject.CreatePrototype (
 				"Door_Simple", 
@@ -117,21 +124,22 @@ public class World {
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
 	public Tile GetTileAt(int x, int y) {
-		if (x>Width||x<0||y>Height||y<0) {
+		if (x>=Width||x<0||y>=Height||y<0) {
 			//Debug.LogError ("wrong coordinates for a tile" + x + " " + y);
 			return null;
 		}
 		return tiles [x, y];
 	}
 
-	public void PlaceStaticObject (string buildModeObjectType, Tile t)
+	public void PlaceStaticObject (string objectType, Tile t)
 	{
 		//TODO: 1 BY 1 TIles assumed change this later with no rotation;
-		if (staticObjectsPrototypes.ContainsKey(buildModeObjectType) == false) {
-			Debug.LogError("doesn`t contains key " + buildModeObjectType);
+		if (staticObjectsPrototypes.ContainsKey(objectType) == false) {
+			Debug.LogError (" no such object prototype " + objectType);
 			return;
 		}
-		StaticObject obj = StaticObject.PlaceInstance (staticObjectsPrototypes [buildModeObjectType],t);
+
+		StaticObject obj = StaticObject.PlaceInstance (staticObjectsPrototypes [objectType],t);
 
 		if (obj == null) {
 			//failed to place obj
@@ -152,14 +160,6 @@ public class World {
 		cb_StaticObjectCreated -= callback;
 	}
 
-	public void RegisterTileChanged(Action<Tile> callback){
-		cb_TileChanged += callback;
-	}
-
-	public void UnregisterTileChanged(Action<Tile> callback){
-		cb_TileChanged -= callback;
-	}
-
 	public void RegisterCharacterCreated(Action<Character> callback){
 		cb_CharacterCreated += callback;
 	}
@@ -168,11 +168,22 @@ public class World {
 		cb_CharacterCreated -= callback;
 	}
 
+	public void RegisterTileChanged(Action<Tile> callback){
+		cb_TileChanged += callback;
+	}
+
+	public void UnregisterTileChanged(Action<Tile> callback){
+		cb_TileChanged -= callback;
+	}
+		
 	// called when any tile changes
 	void OnTileChanged(Tile t){
-		if (cb_TileChanged == null)
+		if (cb_TileChanged == null) {
 			return;
+		}
+
 		cb_TileChanged (t);
+
 		InvalidatePathfindingGraph ();
 	}
 
@@ -184,4 +195,85 @@ public class World {
 	public bool IsStaticObjectPlacementValid(string objType, Tile t){
 		return staticObjectsPrototypes [objType].IsValidPosition(t);
 	}
+
+	public StaticObject GetStaticObjectPrototype(string objType){
+		if (staticObjectsPrototypes.ContainsKey(objType) == false) {
+			return null;
+		}
+
+		return staticObjectsPrototypes [objType];
+	}
+
+	///////////////////////////////////////////////////////
+	/// 
+	///		SAVING AND LOADING
+	///  
+	///////////////////////////////////////////////////////
+
+	public World(){
+		
+	}
+
+
+	#region IXmlSerializable implementation
+	public System.Xml.Schema.XmlSchema GetSchema ()
+	{
+		return null;
+	}
+
+	public void WriteXml (System.Xml.XmlWriter writer)
+	{
+		writer.WriteAttributeString ("Width", Width.ToString());
+		writer.WriteAttributeString ("Height", Height.ToString());
+
+		writer.WriteStartElement ("Tiles");
+		for (int x = 0; x < Width; x++) {
+			for (int y = 0; y < Height; y++) {
+				writer.WriteStartElement ("Tile");
+				tiles [x, y].WriteXml (writer);
+				writer.WriteEndElement();
+			}
+		}
+		writer.WriteEndElement();
+
+	}
+
+	public void ReadXml (System.Xml.XmlReader reader)
+	{
+		reader.MoveToAttribute ("Width");
+		Width = reader.ReadContentAsInt();
+		reader.MoveToAttribute ("Height");
+		Height = reader.ReadContentAsInt();
+		reader.MoveToElement ();
+
+		SetupWorld (Width, Height);
+
+		while (reader.Read) {
+			switch (reader.Name) {
+			case "Tiles":
+				ReadXML_Tiles (reader);
+				break;
+			}
+		}
+
+
+
+	}
+
+	void ReadXML_Tiles (XmlReader reader){
+
+		while (reader.Read) {
+			if (reader.Name != "Tile") {
+				return;
+			}
+					
+			int x = int.Parse (reader.GetAttribute ("X"));
+			int y = int.Parse (reader.GetAttribute ("Y"));
+			tiles [x, y].ReadXml (reader);
+		}
+
+			
+	}
+	#endregion
 }
+

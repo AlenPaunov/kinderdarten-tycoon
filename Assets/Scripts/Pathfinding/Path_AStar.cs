@@ -17,12 +17,15 @@ public class Path_AStar
 		}
 			
 		Dictionary <Tile, Path_Node<Tile>> nodes = world.PathfindingGraph.nodes;
+
 		Path_Node<Tile> start = nodes [tileStart];
 		Path_Node<Tile> goal = nodes [tileEnd];
 
 
 		if (nodes.ContainsKey (tileStart) == false) {
 			Debug.Log ("Error, missing tile in pathgrid - INVALID STARTING POS");
+			//FIXME manually add start tile in the list of valid nodes
+
 		}
 
 		if (nodes.ContainsKey (tileEnd) == false) {
@@ -65,8 +68,8 @@ public class Path_AStar
 				if (ClosedSet.Contains (neighbour)) {
 					continue; // ignore the completed neighbour
 				}		
-
-				float	tentative_g_score = g_score [current] + dist_between (current, neighbour);
+				float	movement_cost_to_neighbour = neighbour.data.movementCost * dist_between (current, neighbour);
+				float	tentative_g_score = g_score [current] + movement_cost_to_neighbour;
 
 				if (OpenedSet.Contains(neighbour) && tentative_g_score >= g_score[neighbour]) {
 					continue;
@@ -131,8 +134,15 @@ public class Path_AStar
 		path = new Queue<Tile>( total_path.Reverse());
 	}
 
-	public Tile GetNextTile ()
+	public Tile DequeueNextTile ()
 	{
 		return path.Dequeue ();
+	}
+
+	public int Lenght(){
+		if (path == null) {
+			return 0;
+		}
+		return path.Count ();
 	}
 }

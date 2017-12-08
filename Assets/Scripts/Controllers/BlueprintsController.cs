@@ -6,12 +6,12 @@ public class BlueprintsController : MonoBehaviour {
 
 	Dictionary<string, Sprite> blueprintsSprites;
 	Dictionary<Job, GameObject> jobGameobjectMap;
-	SpriteController sc;
+	//SpriteController sc;
 	// Use this for initialization
 	void Start () {
 		LoadBlueprints ();
 		jobGameobjectMap = new Dictionary<Job, GameObject> ();
-		sc = GameObject.FindObjectOfType<SpriteController> ();
+		//sc = GameObject.FindObjectOfType<SpriteController> ();
 		WorldController.Instance.World.jobQueue.RegisterJobCreationCallback (OnJobCreated);
 	}
 	
@@ -19,12 +19,16 @@ public class BlueprintsController : MonoBehaviour {
 
 		GameObject job_go = new GameObject ();
 		job_go.name = "obj_" + j.jobObjectType;
-		jobGameobjectMap.Add (j, job_go);	
-			
 		job_go.transform.position	= new Vector3 (j.Tile.X, j.Tile.Y, -2);
 		job_go.transform.SetParent (this.transform, true);
 
+		if (jobGameobjectMap.ContainsKey(j)) {
+			//requed job before done
+			return;
+		}
 
+		jobGameobjectMap.Add (j, job_go);			
+			
 		//FIXME: assume the object must be a wall so we use harcoded wall sprite
 		job_go.AddComponent<SpriteRenderer> ().sprite = GetBlueprint(j);
 
@@ -67,11 +71,11 @@ public class BlueprintsController : MonoBehaviour {
 			return blueprintsSprites [spriteName];
 		} 
 		spriteName += "_";
-		int x = j.Tile.X;
-		int y = j.Tile.Y;
-
-		Tile t;
-		t = WorldController.Instance.World.GetTileAt (x, y + 1);
+//		int x = j.Tile.X;
+//		int y = j.Tile.Y;
+//
+//		Tile t;
+//		t = WorldController.Instance.World.GetTileAt (x, y);
 //		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==j.jobObjectType||t.pendingJob != null && t.pendingJob.jobObjectType == j.jobObjectType) {
 //			spriteName += "N";
 //		}
@@ -87,8 +91,6 @@ public class BlueprintsController : MonoBehaviour {
 //		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==j.jobObjectType||t.pendingJob != null && t.pendingJob.jobObjectType == j.jobObjectType) {
 //			spriteName += "W";
 //		}
-
-		Debug.Log (spriteName);
 		return blueprintsSprites [spriteName];
 	}
 
@@ -117,19 +119,19 @@ public class BlueprintsController : MonoBehaviour {
 
 		Tile t;
 		t = WorldController.Instance.World.GetTileAt (x, y + 1);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "N";
 		}
 		t = WorldController.Instance.World.GetTileAt (x+1, y);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "E";
 		}
 		t = WorldController.Instance.World.GetTileAt(x, y - 1);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "S";
 		}
 		t = WorldController.Instance.World.GetTileAt (x-1, y);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "W";
 		}
 

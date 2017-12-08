@@ -7,6 +7,7 @@ public class SpriteController : MonoBehaviour {
 	
 	public Dictionary<Tile, GameObject> tileGameobjectMap;
 	public Dictionary<StaticObject, GameObject> staticObjGameobjectMap;
+
 	public Dictionary<string, Sprite> staticObjectsSprites;
 	public Dictionary<string, Sprite> tilesSprites;
 
@@ -20,15 +21,11 @@ public class SpriteController : MonoBehaviour {
 	World world{ get { return WorldController.Instance.World; } }
 	// Use this for initialization
 	void Start () {
-
-		LoadSprites ();
-		world.RegisterStaticObjectCreated (OnStaticObjectCreated);
-		world.RandomizeTiles ();
-
 		// instantiate tileGameobject map
 		tileGameobjectMap = new Dictionary<Tile, GameObject>();
 		staticObjGameobjectMap = new Dictionary<StaticObject, GameObject> ();
-
+		LoadSprites ();
+		world.RandomizeTiles ();
 		//create GameObject for each tile in the world
 		CreateTilesObjects ();
 
@@ -164,19 +161,19 @@ public class SpriteController : MonoBehaviour {
 
 		Tile t;
 		t = world.GetTileAt (x, y + 1);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "N";
 		}
 		t = world.GetTileAt (x+1, y);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "E";
 		}
 		t = world.GetTileAt (x, y - 1);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "S";
 		}
 		t = world.GetTileAt (x-1, y);
-		if (t != null && t.StaticObject != null && t.StaticObject.ObjectType==obj.ObjectType) {
+		if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
 			spriteName += "W";
 		}
 

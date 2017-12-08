@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System;
+using System.Xml.Serialization;
 
 public enum TileType
 {
@@ -13,20 +15,22 @@ public enum TileType
 	Water}
 ;
 
-public class Tile
+public class Tile :IXmlSerializable
 {
 
-	TileType type = TileType.Soil;
+	TileType _type = TileType.Soil;
 	public TileType previousType;
 
 	public TileType Type {
 		get {
-			return type;
+			return _type;
 		}
 		set {
-			type = value;
+			TileType oldType = _type;
+			_type = value;
+
 			//call back on type change
-			if (cb_TileChanged != null) {
+			if (cb_TileChanged != null && oldType != _type) {
 				cb_TileChanged (this);
 			}
 		}
@@ -37,17 +41,18 @@ public class Tile
 			if (Type == TileType.Water) {
 				return 0;
 			}
-			if (StaticObject == null) {
+
+			if (this.staticObject == null) {
 				return 1;
 			}
 
-			return 1* StaticObject.movementCost;
+			return 1 * staticObject.movementCost;
 		}
 	}
 
 	public DynamicObject DynamicObject { get; protected set; }
 
-	public StaticObject StaticObject{ get; protected set; }
+	public StaticObject staticObject{ get; protected set; }
 
 	public Job pendingJob;
 	/// <summary>
@@ -113,7 +118,7 @@ public class Tile
 		ns [3] = n;
 
 		if (diagonal == true) {
-			n = World.GetTileAt (X+1, Y + 1); //NE
+			n = World.GetTileAt (X + 1, Y + 1); //NE
 			ns [4] = n;
 			n = World.GetTileAt (X + 1, Y - 1); // ES
 			ns [5] = n;
@@ -158,18 +163,38 @@ public class Tile
 	{
 		if (objInstance == null) {
 			//WE are uninstalling
-			StaticObject = null;
+			this.staticObject = null;
 			return true;
 		}
 
-		if (StaticObject != null) {
+		if (staticObject != null) {
 			Debug.LogError ("tryig to install on installed static object");
 			return false;
-		} else {
-			StaticObject = objInstance;
+		} 
+		else {
+			staticObject = objInstance;
 			return true;
 		}
 	}
 		
 
+	#region IXmlSerializable implementation
+	public System.Xml.Schema.XmlSchema GetSchema ()
+	{
+		return null;
+	}
+
+	public void WriteXml (System.Xml.XmlWriter writer)
+	{
+		writer.WriteAttributeString("X",X.ToString());
+		writer.WriteAttributeString ("Y", Y.ToString());
+		writer.WriteAttributeString ("Type", ((int)Type).ToString());
+	}
+
+	public void ReadXml (System.Xml.XmlReader reader)
+	{
+		Type = (TileType)int.Parse (reader.GetAttribute ("Type"));
+	}
+
+	#endregion
 }

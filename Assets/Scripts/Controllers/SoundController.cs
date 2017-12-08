@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SoundController : MonoBehaviour {
 	Dictionary<string, AudioClip> sounds;
-	bool wasInitialized = false;
+	//bool wasInitialized = false;
 
 
 	float soundCoolDown = 0;

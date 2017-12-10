@@ -8,7 +8,7 @@ using System.Xml;
 public class World :IXmlSerializable {
 	//out tile data
 	Tile[,] tiles;
-	List<Character> characters;
+	public List<Character> characters;
 	public List<StaticObject> staticObjects;
 	public Path_TileGraph PathfindingGraph { get; set;}
 
@@ -32,6 +32,7 @@ public class World :IXmlSerializable {
 	public World(int width, int height){
 
 		SetupWorld (width, height);
+		CreateCharacter (GetTileAt (Height / 2, Width / 2));
 
 	}
 
@@ -53,6 +54,7 @@ public class World :IXmlSerializable {
 		CreateStaticObjectPrototypes ();
 
 		characters = new List<Character> ();
+
 		staticObjects = new List<StaticObject> ();
 
 	}
@@ -133,19 +135,19 @@ public class World :IXmlSerializable {
 		return tiles [x, y];
 	}
 
-	public void PlaceStaticObject (string objectType, Tile t)
+	public StaticObject PlaceStaticObject (string objectType, Tile t)
 	{
 		//TODO: 1 BY 1 TIles assumed change this later with no rotation;
 		if (staticObjectsPrototypes.ContainsKey(objectType) == false) {
 			Debug.LogError (" no such object prototype " + objectType);
-			return;
+			return null;
 		}
 
 		StaticObject staticObject = StaticObject.PlaceInstance (staticObjectsPrototypes [objectType],t);
 
 		if (staticObject == null) {
 			//failed to place obj
-			return;
+			return null;
 		}
 		staticObjects.Add (staticObject);
 
@@ -153,6 +155,8 @@ public class World :IXmlSerializable {
 			cb_StaticObjectCreated (staticObject);
 			InvalidatePathfindingGraph ();
 		}
+
+		return staticObject;
 	}
 
 	public void RegisterStaticObjectCreated(Action<StaticObject> callback){
@@ -323,6 +327,7 @@ public class World :IXmlSerializable {
 
 			//StaticObject staticObject = PlaceStaticObject( reader.GetAttribute("objectType"), tiles[x,y] );
 			//staticObject.ReadXml(reader);
+			StaticObject staticObject = PlaceStaticObject(reader.GetAttribute("objectType"),tiles[x,y]);
 		}
 
 	}

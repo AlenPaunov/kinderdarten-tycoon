@@ -75,19 +75,19 @@ public class StaticObject : IXmlSerializable{
 			Tile t;
 
 			t = tile.World.GetTileAt (x, y + 1);
-			if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
+			if (t != null && t.staticObject != null && t.staticObject.cb_OnChanged != null && t.staticObject.ObjectType==obj.ObjectType) {
 				t.staticObject.cb_OnChanged(t.staticObject);
 			}
 			t = tile.World.GetTileAt (x+1, y);
-			if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
+			if (t != null && t.staticObject != null && t.staticObject.cb_OnChanged != null && t.staticObject.ObjectType==obj.ObjectType) {
 				t.staticObject.cb_OnChanged(t.staticObject);
 			}
 			t = tile.World.GetTileAt (x, y - 1);
-			if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
+			if (t != null && t.staticObject != null && t.staticObject.cb_OnChanged != null && t.staticObject.ObjectType==obj.ObjectType) {
 				t.staticObject.cb_OnChanged(t.staticObject);
 			}
 			t = tile.World.GetTileAt (x-1, y);
-			if (t != null && t.staticObject != null && t.staticObject.ObjectType==obj.ObjectType) {
+			if (t != null && t.staticObject != null && t.staticObject.cb_OnChanged != null && t.staticObject.ObjectType==obj.ObjectType) {
 				t.staticObject.cb_OnChanged(t.staticObject);
 			}
 		}
@@ -133,8 +133,9 @@ public class StaticObject : IXmlSerializable{
 	public void ReadXml(XmlReader reader) {
 		// X, Y, and objectType have already been set, and we should already
 		// be assigned to a tile.  So just read extra data.
-		ObjectType = reader.GetAttribute("objectType");
+		//ObjectType = reader.GetAttribute("objectType");
 		movementCost = int.Parse( reader.GetAttribute("movementCost") );	
+
 	}
 	#endregion
 }

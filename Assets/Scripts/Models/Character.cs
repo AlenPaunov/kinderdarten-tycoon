@@ -88,7 +88,7 @@ public class Character : IXmlSerializable {
 			if (path == null || path.Lenght() == 0) {
 				path = new Path_AStar (currTile.World, currTile, destTile);
 				if (path.Lenght() == 0) {
-					Debug.Log ("no path to dest");
+					//Debug.Log ("no path to dest");
 					//FIXME job maybe must be reenqued instead;
 					AbandonJob();
 					//FIXME cancel Job;
@@ -98,7 +98,7 @@ public class Character : IXmlSerializable {
 			//grab next tile
 			nextTile = path.DequeueNextTile();
 			if (nextTile == currTile) {
-				Debug.LogError ("Update movement - next tile is currtile");
+				//Debug.LogError ("Update movement - next tile is currtile");
 			}
 		}
 			

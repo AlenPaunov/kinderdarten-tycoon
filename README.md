@@ -1,4 +1,4 @@
-# kinderdarten-tycoon
+# kindergarten-tycoon
 my game tycoon as a present for my wife!!!
 
 Credits to quill18creates which videos I am watching to make this project

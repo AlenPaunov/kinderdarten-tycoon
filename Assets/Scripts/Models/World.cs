@@ -9,6 +9,7 @@ public class World :IXmlSerializable {
 	//out tile data
 	Tile[,] tiles;
 	List<Character> characters;
+	public List<StaticObject> staticObjects;
 	public Path_TileGraph PathfindingGraph { get; set;}
 
 	// The static objects prototypes.
@@ -52,6 +53,7 @@ public class World :IXmlSerializable {
 		CreateStaticObjectPrototypes ();
 
 		characters = new List<Character> ();
+		staticObjects = new List<StaticObject> ();
 
 	}
 
@@ -139,15 +141,16 @@ public class World :IXmlSerializable {
 			return;
 		}
 
-		StaticObject obj = StaticObject.PlaceInstance (staticObjectsPrototypes [objectType],t);
+		StaticObject staticObject = StaticObject.PlaceInstance (staticObjectsPrototypes [objectType],t);
 
-		if (obj == null) {
+		if (staticObject == null) {
 			//failed to place obj
 			return;
 		}
+		staticObjects.Add (staticObject);
 
 		if (cb_StaticObjectCreated != null) {
-			cb_StaticObjectCreated (obj);
+			cb_StaticObjectCreated (staticObject);
 			InvalidatePathfindingGraph ();
 		}
 	}
@@ -178,12 +181,11 @@ public class World :IXmlSerializable {
 		
 	// called when any tile changes
 	void OnTileChanged(Tile t){
+
 		if (cb_TileChanged == null) {
 			return;
 		}
-
 		cb_TileChanged (t);
-
 		InvalidatePathfindingGraph ();
 	}
 
@@ -236,6 +238,24 @@ public class World :IXmlSerializable {
 		}
 		writer.WriteEndElement();
 
+		writer.WriteStartElement("StaticObjects");
+		foreach(StaticObject staticObject in staticObjects) {
+			writer.WriteStartElement("StaticObject");
+			staticObject.WriteXml(writer);
+			writer.WriteEndElement();
+
+		}
+		writer.WriteEndElement();
+
+		writer.WriteStartElement("Characters");
+		foreach(Character c in characters) {
+			writer.WriteStartElement("Character");
+			c.WriteXml(writer);
+			writer.WriteEndElement();
+
+		}
+		writer.WriteEndElement();
+
 	}
 
 	public void ReadXml (System.Xml.XmlReader reader)
@@ -248,21 +268,25 @@ public class World :IXmlSerializable {
 
 		SetupWorld (Width, Height);
 
-		while (reader.Read) {
+		while (reader.Read()) {
 			switch (reader.Name) {
 			case "Tiles":
 				ReadXML_Tiles (reader);
 				break;
+			case "StaticObjects":
+				ReadXml_StaticObjects(reader);
+				break;
+			case "Characters":
+				ReadXml_Characters(reader);
+				break;
 			}
 		}
-
-
 
 	}
 
 	void ReadXML_Tiles (XmlReader reader){
 
-		while (reader.Read) {
+		while (reader.Read()) {
 			if (reader.Name != "Tile") {
 				return;
 			}
@@ -271,8 +295,36 @@ public class World :IXmlSerializable {
 			int y = int.Parse (reader.GetAttribute ("Y"));
 			tiles [x, y].ReadXml (reader);
 		}
-
 			
+	}
+
+	void ReadXml_Characters(XmlReader reader) {
+		Debug.Log("ReadXml_Characters");
+		while(reader.Read()) {
+			if(reader.Name != "Character")
+				return;
+
+			int x = int.Parse( reader.GetAttribute("X") );
+			int y = int.Parse( reader.GetAttribute("Y") );
+
+			Character c = CreateCharacter( tiles[x,y] );
+			c.ReadXml(reader);
+		}
+	}
+
+	void ReadXml_StaticObjects(XmlReader reader) {
+		Debug.Log("ReadXml_StaticObjects");
+		while(reader.Read()) {
+			if(reader.Name != "StaticObject")
+				return;
+
+			int x = int.Parse( reader.GetAttribute("X") );
+			int y = int.Parse( reader.GetAttribute("Y") );
+
+			//StaticObject staticObject = PlaceStaticObject( reader.GetAttribute("objectType"), tiles[x,y] );
+			//staticObject.ReadXml(reader);
+		}
+
 	}
 	#endregion
 }

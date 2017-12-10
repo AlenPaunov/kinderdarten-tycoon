@@ -33,6 +33,7 @@ public class WorldController : MonoBehaviour {
 	void CreateWorld ()
 	{
 		World = new World (40,40);
+		World.RandomizeTiles ();
 		Camera.main.transform.position = new Vector3 (World.Width / 2, World.Height / 2, Camera.main.transform.position.z);
 		Camera.main.orthographicSize = 2;
 	}
@@ -53,6 +54,7 @@ public class WorldController : MonoBehaviour {
 	public void RestartWorld()
 	{
 		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+		//World.RandomizeTiles ();
 	}
 
 	public void SaveWorld(){

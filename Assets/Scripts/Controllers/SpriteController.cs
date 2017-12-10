@@ -16,7 +16,6 @@ public class SpriteController : MonoBehaviour {
 	public Sprite gravelSprite;
 	public Sprite roughtStoneSprite;
 	public Sprite floorSprite;
-	public Sprite wallSprite; //FIXME;
 
 	World world{ get { return WorldController.Instance.World; } }
 	// Use this for initialization
@@ -25,12 +24,16 @@ public class SpriteController : MonoBehaviour {
 		tileGameobjectMap = new Dictionary<Tile, GameObject>();
 		staticObjGameobjectMap = new Dictionary<StaticObject, GameObject> ();
 		LoadSprites ();
-		world.RandomizeTiles ();
+		//world.RandomizeTiles ();
 		//create GameObject for each tile in the world
 		CreateTilesObjects ();
 
 		world.RegisterTileChanged (OnTileChanged);
 		world.RegisterStaticObjectCreated (OnStaticObjectCreated);
+
+		foreach (var staticObject in world.staticObjects) {
+			OnStaticObjectCreated (staticObject);
+		}
 	}
 
 	void CreateTilesObjects ()

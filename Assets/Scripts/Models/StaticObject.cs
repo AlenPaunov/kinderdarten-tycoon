@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+using System.Xml;
 
-public class StaticObject{
+public class StaticObject : IXmlSerializable{
 
 	public Tile Tile{ get; protected set; } //represents the base tile beneth the object;
 
@@ -112,4 +115,26 @@ public class StaticObject{
 		}
 		return true;
 	}
+
+	#region IXmlSerializable implementation
+
+	public XmlSchema GetSchema ()
+	{
+		return null;
+	}
+
+	public void WriteXml(XmlWriter writer) {
+		writer.WriteAttributeString( "X", Tile.X.ToString() );
+		writer.WriteAttributeString( "Y", Tile.Y.ToString() );
+		writer.WriteAttributeString( "objectType", ObjectType );
+		writer.WriteAttributeString( "movementCost", movementCost.ToString() );
+	}
+
+	public void ReadXml(XmlReader reader) {
+		// X, Y, and objectType have already been set, and we should already
+		// be assigned to a tile.  So just read extra data.
+		ObjectType = reader.GetAttribute("objectType");
+		movementCost = int.Parse( reader.GetAttribute("movementCost") );	
+	}
+	#endregion
 }
